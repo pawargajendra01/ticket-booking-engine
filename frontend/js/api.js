@@ -49,3 +49,16 @@ function cancelBooking(bookingId) {
 function getWaitlist(eventId) {
     return apiRequest(`/events/${eventId}/waitlist`);
 }
+
+function createPaymentOrder(bookingId) {
+    return apiRequest(`/bookings/${bookingId}/payment-order`, {
+        method: "POST",
+    });
+}
+
+function verifyPayment(bookingId, razorpayOrderId, razorpayPaymentId, razorpaySignature) {
+    return apiRequest(`/bookings/${bookingId}/verify-payment`, {
+        method: "POST",
+        body: JSON.stringify({ razorpayOrderId, razorpayPaymentId, razorpaySignature }),
+    });
+}

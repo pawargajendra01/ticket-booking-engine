@@ -26,6 +26,75 @@ function renderResult(response) {
     `;
 }
 
+function renderPaidResult(bookingId) {
+    const resultDiv = document.getElementById("result");
+    resultDiv.innerHTML = `
+        <div class="result-box">
+            <span class="badge badge-confirmed">PAID</span>
+            <p style="margin-top: 12px;">Booking ID: ${bookingId}</p>
+            <p>Your seat is fully confirmed and paid.</p>
+        </div>
+    `;
+}
+
+function renderPaymentPendingResult(bookingId, statusMessage) {
+    const resultDiv = document.getElementById("result");
+    resultDiv.innerHTML = `
+        <div class="result-box">
+            <span class="badge badge-waitlisted">PAYMENT PENDING</span>
+            <p style="margin-top: 12px;">Booking ID: ${bookingId}</p>
+            <p>${statusMessage}</p>
+            <p>Your seat is held for 10 minutes. Pay before it expires or it will be released.</p>
+        </div>
+    `;
+}
+
+async function startPayment(bookingResponse) {
+    const bookingId = bookingResponse.bookingId;
+
+    try {
+        const order = await createPaymentOrder(bookingId);
+
+        const options = {
+            key: order.keyId,
+            amount: order.amount,
+            currency: order.currency,
+            name: "TicketHub",
+            description: "Event seat payment",
+            order_id: order.orderId,
+            prefill: {
+                name: bookingResponse.userId,
+            },
+            theme: {
+                color: "#4f46e5",
+            },
+            handler: async function (razorpayResponse) {
+                try {
+                    await verifyPayment(
+                        bookingId,
+                        razorpayResponse.razorpay_order_id,
+                        razorpayResponse.razorpay_payment_id,
+                        razorpayResponse.razorpay_signature
+                    );
+                    renderPaidResult(bookingId);
+                } catch (verifyError) {
+                    renderPaymentPendingResult(bookingId, `Payment verification failed: ${verifyError.message}`);
+                }
+            },
+            modal: {
+                ondismiss: function () {
+                    renderPaymentPendingResult(bookingId, "Payment window closed before completing.");
+                },
+            },
+        };
+
+        const razorpayCheckout = new Razorpay(options);
+        razorpayCheckout.open();
+    } catch (error) {
+        renderPaymentPendingResult(bookingId, `Could not start payment: ${error.message}`);
+    }
+}
+
 async function handleBookingSubmit(event) {
     event.preventDefault();
 
@@ -39,6 +108,10 @@ async function handleBookingSubmit(event) {
         const response = await bookSeat(eventId, userId, priorityTier);
         statusMessage.textContent = "";
         renderResult(response);
+
+        if (response.status === "CONFIRMED") {
+            await startPayment(response);
+        }
     } catch (error) {
         statusMessage.textContent = `Booking failed: ${error.message}`;
     }

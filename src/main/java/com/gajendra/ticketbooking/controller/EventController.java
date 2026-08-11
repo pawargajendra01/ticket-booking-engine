@@ -1,5 +1,7 @@
 package com.gajendra.ticketbooking.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +33,11 @@ public class EventController {
         public String name;
         @Min(1)
         public int totalSeats;
+    }
+
+    @GetMapping
+    public List<Event> getAllEvents() {
+        return eventRepository.findAll();
     }
 
     @PostMapping
