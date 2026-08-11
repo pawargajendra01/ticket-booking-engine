@@ -38,8 +38,22 @@ public class Booking {
 
     @Column(nullable = false)
     private Instant requestedAt;
+    private boolean paid = false;
+    private Instant paymentDeadline;
 
     protected Booking() {
+    }
+    public boolean isPaid() { 
+        return paid; 
+    } 
+    public void setPaid(boolean paid) { 
+        this.paid = paid;
+    } 
+    public Instant getPaymentDeadline() {
+        return paymentDeadline;
+    } 
+    public void setPaymentDeadline(Instant paymentDeadline) {
+        this.paymentDeadline = paymentDeadline; 
     }
 
     public Booking(Event event, String userId, int priorityTier, BookingStatus status) {

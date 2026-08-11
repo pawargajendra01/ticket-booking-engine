@@ -1,5 +1,6 @@
 package com.gajendra.ticketbooking.service;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -25,6 +26,8 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final WaitlistManager waitlistManager;
 
+    private static final long PAYMENT_DEADLINE_SECONDS = 600; // 10 minutes to pay
+
     public BookingService(EventRepository eventRepository,
                            BookingRepository bookingRepository,
                            WaitlistManager waitlistManager) {
@@ -43,6 +46,7 @@ public class BookingService {
             eventRepository.save(event);
 
             Booking booking = new Booking(event, request.getUserId(), request.getPriorityTier(), BookingStatus.CONFIRMED);
+            booking.setPaymentDeadline(Instant.now().plusSeconds(PAYMENT_DEADLINE_SECONDS));
             bookingRepository.save(booking);
 
             return new BookingResponse(booking, event.getAvailableSeats());
