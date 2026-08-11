@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicketHub — Book Seat</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="topnav">
+        <a href="index.html" class="brand">TicketHub</a>
+        <nav>
+            <a href="index.html">Events</a>
+            <a href="my-bookings.html">My Bookings</a>
+            <a href="admin.html">Admin</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1 id="event-title">Book Your Seat</h1>
+        <p id="status-message" class="status-message"></p>
+
+        <form id="booking-form">
+            <label for="userId">Your Name / User ID</label>
+            <input type="text" id="userId" required placeholder="e.g. alice">
+
+            <label for="priorityTier">Priority Tier</label>
+            <select id="priorityTier">
+                <option value="1">1 — VIP</option>
+                <option value="2">2 — Premium</option>
+                <option value="5" selected>5 — Standard</option>
+            </select>
+
+            <button type="submit" class="btn btn-primary">Confirm Booking</button>
+        </form>
+
+        <div id="result" style="margin-top: 20px;"></div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/book.js"></script>
+</body>
+</html>

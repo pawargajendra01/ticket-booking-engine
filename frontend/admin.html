@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicketHub — Admin</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="topnav">
+        <a href="index.html" class="brand">TicketHub</a>
+        <nav>
+            <a href="index.html">Events</a>
+            <a href="my-bookings.html">My Bookings</a>
+            <a href="admin.html">Admin</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Create a New Event</h1>
+        <p id="status-message" class="status-message"></p>
+
+        <form id="create-event-form">
+            <label for="eventName">Event Name</label>
+            <input type="text" id="eventName" required placeholder="e.g. Coldplay Live">
+
+            <label for="totalSeats">Total Seats</label>
+            <input type="number" id="totalSeats" required min="1" placeholder="e.g. 50">
+
+            <button type="submit" class="btn btn-primary">Create Event</button>
+        </form>
+
+        <div id="result" style="margin-top: 20px;"></div>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
