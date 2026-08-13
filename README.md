@@ -6,6 +6,8 @@ a custom priority-queue waitlist, a vanilla JS frontend for browsing and
 booking events, and real Razorpay payment integration with a time-limited
 seat hold that auto-releases if payment isn't completed.
 
+Live demo: https://tickethub-pq.netlify.app (backend hosted on Railway, may briefly cold-start on first load)
+
 Built to demonstrate: Java OOP, Spring Boot REST APIs, SQL ACID
 transactions, a hand-written data structure (binary min-heap) used for a
 real performance reason, scheduled background jobs, and payment gateway
