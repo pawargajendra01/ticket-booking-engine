@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "https://ticket-booking-engine-production.up.railway.app/api";
 
 async function apiRequest(path, options = {}) {
     const response = await fetch(`${API_BASE_URL}${path}`, {
