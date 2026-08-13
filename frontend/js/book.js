@@ -1,3 +1,5 @@
+let countdownIntervalId = null;
+
 function getEventIdFromUrl() {
     const params = new URLSearchParams(window.location.search);
     return params.get("eventId");
@@ -12,6 +14,42 @@ async function loadEventTitle(eventId) {
     }
 }
 
+function stopCountdown() {
+    if (countdownIntervalId) {
+        clearInterval(countdownIntervalId);
+        countdownIntervalId = null;
+    }
+}
+
+function startCountdown(deadlineIso) {
+    stopCountdown();
+    const deadline = new Date(deadlineIso).getTime();
+    const timerEl = document.getElementById("countdown-timer");
+
+    function tick() {
+        const now = Date.now();
+        const remainingMs = deadline - now;
+
+        if (remainingMs <= 0) {
+            timerEl.textContent = "Time expired \u2014 seat may be released";
+            timerEl.style.color = "#b91c1c";
+            stopCountdown();
+            return;
+        }
+
+        const totalSeconds = Math.floor(remainingMs / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        const formatted = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+
+        timerEl.textContent = `Complete payment within: ${formatted}`;
+        timerEl.style.color = remainingMs < 60000 ? "#b91c1c" : "#92400e";
+    }
+
+    tick();
+    countdownIntervalId = setInterval(tick, 1000);
+}
+
 function renderResult(response) {
     const resultDiv = document.getElementById("result");
     const badgeClass = response.status === "CONFIRMED" ? "badge-confirmed" : "badge-waitlisted";
@@ -22,11 +60,17 @@ function renderResult(response) {
             <p style="margin-top: 12px;">Booking ID: ${response.bookingId}</p>
             <p>User: ${response.userId}</p>
             <p>Seats remaining: ${response.remainingSeats}</p>
+            ${response.status === "CONFIRMED" ? '<p id="countdown-timer" style="font-weight: 700; margin-top: 12px;"></p>' : ""}
         </div>
     `;
+
+    if (response.status === "CONFIRMED" && response.paymentDeadline) {
+        startCountdown(response.paymentDeadline);
+    }
 }
 
 function renderPaidResult(bookingId) {
+    stopCountdown();
     const resultDiv = document.getElementById("result");
     resultDiv.innerHTML = `
         <div class="result-box">
@@ -37,16 +81,19 @@ function renderPaidResult(bookingId) {
     `;
 }
 
-function renderPaymentPendingResult(bookingId, statusMessage) {
+function renderPaymentPendingResult(bookingId, statusMessage, deadlineIso) {
     const resultDiv = document.getElementById("result");
     resultDiv.innerHTML = `
         <div class="result-box">
             <span class="badge badge-waitlisted">PAYMENT PENDING</span>
             <p style="margin-top: 12px;">Booking ID: ${bookingId}</p>
             <p>${statusMessage}</p>
-            <p>Your seat is held for 10 minutes. Pay before it expires or it will be released.</p>
+            <p id="countdown-timer" style="font-weight: 700; margin-top: 12px;"></p>
         </div>
     `;
+    if (deadlineIso) {
+        startCountdown(deadlineIso);
+    }
 }
 
 async function startPayment(bookingResponse) {
@@ -78,12 +125,12 @@ async function startPayment(bookingResponse) {
                     );
                     renderPaidResult(bookingId);
                 } catch (verifyError) {
-                    renderPaymentPendingResult(bookingId, `Payment verification failed: ${verifyError.message}`);
+                    renderPaymentPendingResult(bookingId, `Payment verification failed: ${verifyError.message}`, bookingResponse.paymentDeadline);
                 }
             },
             modal: {
                 ondismiss: function () {
-                    renderPaymentPendingResult(bookingId, "Payment window closed before completing.");
+                    renderPaymentPendingResult(bookingId, "Payment window closed before completing.", bookingResponse.paymentDeadline);
                 },
             },
         };
@@ -91,7 +138,7 @@ async function startPayment(bookingResponse) {
         const razorpayCheckout = new Razorpay(options);
         razorpayCheckout.open();
     } catch (error) {
-        renderPaymentPendingResult(bookingId, `Could not start payment: ${error.message}`);
+        renderPaymentPendingResult(bookingId, `Could not start payment: ${error.message}`, bookingResponse.paymentDeadline);
     }
 }
 
