@@ -26,10 +26,16 @@ function getEvent(eventId) {
     return apiRequest(`/events/${eventId}`);
 }
 
-function createEvent(name, totalSeats) {
+function createEvent(name, totalSeats, venue, eventDateTime, description, imageUrl) {
     return apiRequest("/events", {
         method: "POST",
-        body: JSON.stringify({ name, totalSeats }),
+        body: JSON.stringify({ name, totalSeats, venue, eventDateTime, description, imageUrl }),
+    });
+}
+
+function deleteEvent(eventId) {
+    return apiRequest(`/events/${eventId }`, {
+        method: "DELETE",
     });
 }
 

@@ -24,13 +24,30 @@
             <label for="eventName">Event Name</label>
             <input type="text" id="eventName" required placeholder="e.g. Coldplay Live">
 
+            <label for="venue">Venue</label>
+            <input type="text" id="venue" required placeholder="e.g. DY Patil Stadium, Mumbai">
+
+            <label for="eventDateTime">Date & Time</label>
+            <input type="text" id="eventDateTime" required placeholder="e.g. Dec 25, 2026 - 7:30 PM">
+
             <label for="totalSeats">Total Seats</label>
             <input type="number" id="totalSeats" required min="1" placeholder="e.g. 50">
+
+            <label for="description">Description</label>
+            <input type="text" id="description" placeholder="Short description (optional)">
+
+            <label for="imageUrl">Poster Image URL</label>
+            <input type="text" id="imageUrl" placeholder="https://... (optional)">
 
             <button type="submit" class="btn btn-primary">Create Event</button>
         </form>
 
         <div id="result" style="margin-top: 20px;"></div>
+
+        <hr style="margin: 32px 0; border: none; border-top: 1px solid #ddd;">
+
+        <h1>Existing Events</h1>
+        <div id="existing-events-list"></div>
     </main>
 
     <script src="js/api.js"></script>

@@ -20,13 +20,20 @@ async function loadEvents() {
 
             const soldOut = event.availableSeats === 0;
 
+            const imageHtml = event.imageUrl
+                ? `<img src="${event.imageUrl}" alt="${event.name}" style="width:100%; height:160px; object-fit:cover; border-radius:8px; margin-bottom:12px;" onerror="this.style.display='none'">`
+                : "";
+
             card.innerHTML = `
-                <h2>${event.name}</h2>
-                <p>${event.availableSeats} of ${event.totalSeats} seats available</p>
-                <a class="btn ${soldOut ? "btn-secondary" : "btn-primary"}" href="book.html?eventId=${event.id}">
-                    ${soldOut ? "Join Waitlist" : "Book Now"}
-                </a>
-            `;
+    ${imageHtml}
+    <h2>${event.name}</h2>
+    <p style="color:#4f46e5; font-weight:600; font-size:13px; margin-bottom:4px;">${event.venue || "Venue TBA"}</p>
+    <p style="color:#888; font-size:13px; margin-bottom:8px;">${event.eventDateTime || "Date TBA"}</p>
+    <p>${event.availableSeats} of ${event.totalSeats} seats available</p>
+    <a class="btn ${soldOut ? "btn-secondary" : "btn-primary"}" href="book.html?eventId=${event.id}">
+        ${soldOut ? "Join Waitlist" : "Book Now"}
+    </a>
+`;
 
             eventsList.appendChild(card);
         });

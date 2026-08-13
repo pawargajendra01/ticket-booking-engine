@@ -24,6 +24,10 @@ public class Event {
 
     @Column(nullable = false)
     private int availableSeats;
+    private String venue;
+    private String eventDateTime;
+    private String description;
+    private String imageUrl;
 
     protected Event() {
         // JPA needs an empty constructor - don't call this yourself
@@ -33,6 +37,16 @@ public class Event {
         this.name = name;
         this.totalSeats = totalSeats;
         this.availableSeats = totalSeats;
+    }
+
+    public Event(String name, int totalSeats, String venue, String eventDateTime, String description, String imageUrl) {
+        this.name = name;
+        this.totalSeats = totalSeats;
+        this.availableSeats = totalSeats;
+        this.venue = venue;
+        this.eventDateTime = eventDateTime;
+        this.description = description;
+        this.imageUrl = imageUrl;
     }
 
     public Long getId() {
@@ -50,12 +64,29 @@ public class Event {
     public int getAvailableSeats() {
         return availableSeats;
     }
+
+    public String getVenue() {
+        return venue;
+    }
+
+    public String getEventDateTime() {
+        return eventDateTime;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
     @Version
     private Long version;
 
     public Long getVersion() {
         return version;
     }
+
     public boolean hasSeatAvailable() {
         return availableSeats > 0;
     }

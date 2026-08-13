@@ -10,5 +10,6 @@ import com.gajendra.ticketbooking.entity.BookingStatus;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByEventId(Long eventId);
+    long countByEventIdAndStatusIn(Long eventId, List<BookingStatus> statuses);
     List<Booking> findByStatusAndPaidFalseAndPaymentDeadlineBefore(BookingStatus status, Instant deadline);
 }
