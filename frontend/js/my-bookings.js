@@ -50,5 +50,43 @@ async function handleCancelSubmit(event) {
     }
 }
 
+async function handleMyBookingsSubmit(event) {
+    event.preventDefault();
+    const userId = document.getElementById("myUserId").value;
+    const listDiv = document.getElementById("my-bookings-list");
+
+    try {
+        listDiv.innerHTML = "<p>Loading...</p>";
+        const bookings = await getMyBookings(userId);
+
+        if (bookings.length === 0) {
+            listDiv.innerHTML = "<p>No bookings found for this user.</p>";
+            return;
+        }
+
+        listDiv.innerHTML = "";
+        bookings.forEach((booking) => {
+            const card = document.createElement("div");
+            card.className = "result-box";
+            card.style.marginBottom = "12px";
+
+            const badgeClass = booking.status === "CONFIRMED" ? "badge-confirmed" : "badge-waitlisted";
+            const paidText = booking.status === "CONFIRMED" ? (booking.paid ? " \u2022 PAID" : " \u2022 UNPAID") : "";
+
+            card.innerHTML = `
+                <span class="badge ${badgeClass}">${booking.status}${paidText}</span>
+                <p style="margin-top: 12px;">${booking.eventName}</p>
+                <p>${booking.venue || "Venue TBA"} \u2022 ${booking.eventDateTime || "Date TBA"}</p>
+                <p>Booking ID: ${booking.bookingId}</p>
+            `;
+
+            listDiv.appendChild(card);
+        });
+    } catch (error) {
+        listDiv.innerHTML = `<p>Failed to load bookings: ${error.message}</p>`;
+    }
+}
+
 document.getElementById("waitlist-form").addEventListener("submit", handleWaitlistSubmit);
+document.getElementById("my-bookings-form").addEventListener("submit", handleMyBookingsSubmit);
 document.getElementById("cancel-form").addEventListener("submit", handleCancelSubmit);

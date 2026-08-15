@@ -25,14 +25,19 @@ async function loadEvents() {
                 : "";
 
             card.innerHTML = `
-    ${imageHtml}
-    <h2>${event.name}</h2>
-    <p style="color:#4f46e5; font-weight:600; font-size:13px; margin-bottom:4px;">${event.venue || "Venue TBA"}</p>
-    <p style="color:#888; font-size:13px; margin-bottom:8px;">${event.eventDateTime || "Date TBA"}</p>
-    <p>${event.availableSeats} of ${event.totalSeats} seats available</p>
-    <a class="btn ${soldOut ? "btn-secondary" : "btn-primary"}" href="book.html?eventId=${event.id}">
-        ${soldOut ? "Join Waitlist" : "Book Now"}
-    </a>
+    <div class="card-top">
+        ${imageHtml}
+        <h2>${event.name}</h2>
+        <p style="color:var(--magenta); font-weight:600;">${event.venue || "Venue TBA"}</p>
+        <p>${event.eventDateTime || "Date TBA"}</p>
+    </div>
+    <div class="ticket-divider"></div>
+    <div class="card-bottom">
+        <p>${event.availableSeats} of ${event.totalSeats} seats available</p>
+        <a class="btn ${soldOut ? "btn-secondary" : "btn-primary"}" href="book.html?eventId=${event.id}">
+            ${soldOut ? "Join Waitlist" : "Book Now"}
+        </a>
+    </div>
 `;
 
             eventsList.appendChild(card);

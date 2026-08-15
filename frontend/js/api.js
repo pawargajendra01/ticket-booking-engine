@@ -33,8 +33,8 @@ function createEvent(name, totalSeats, venue, eventDateTime, description, imageU
     });
 }
 
-function deleteEvent(eventId) {
-    return apiRequest(`/events/${eventId }`, {
+function deleteEvent(eventId, force = false) {
+    return apiRequest(`/events/${eventId}${force ? "?force=true" : ""}`, {
         method: "DELETE",
     });
 }
@@ -67,4 +67,8 @@ function verifyPayment(bookingId, razorpayOrderId, razorpayPaymentId, razorpaySi
         method: "POST",
         body: JSON.stringify({ razorpayOrderId, razorpayPaymentId, razorpaySignature }),
     });
+}
+
+function getMyBookings(userId) {
+    return apiRequest(`/bookings?userId=${encodeURIComponent(userId)}`);
 }

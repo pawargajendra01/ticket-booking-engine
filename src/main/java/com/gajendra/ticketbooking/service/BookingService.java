@@ -2,6 +2,7 @@ package com.gajendra.ticketbooking.service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gajendra.ticketbooking.datastructure.WaitlistRequest;
 import com.gajendra.ticketbooking.dto.BookingRequest;
 import com.gajendra.ticketbooking.dto.BookingResponse;
+import com.gajendra.ticketbooking.dto.MyBookingResponse;
 import com.gajendra.ticketbooking.entity.Booking;
 import com.gajendra.ticketbooking.entity.BookingStatus;
 import com.gajendra.ticketbooking.entity.Event;
@@ -29,8 +31,8 @@ public class BookingService {
     private static final long PAYMENT_DEADLINE_SECONDS = 600; // 10 minutes to pay
 
     public BookingService(EventRepository eventRepository,
-                           BookingRepository bookingRepository,
-                           WaitlistManager waitlistManager) {
+            BookingRepository bookingRepository,
+            WaitlistManager waitlistManager) {
         this.eventRepository = eventRepository;
         this.bookingRepository = bookingRepository;
         this.waitlistManager = waitlistManager;
@@ -108,5 +110,11 @@ public class BookingService {
             throw new EventNotFoundException(eventId);
         }
         return waitlistManager.viewWaitlist(eventId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MyBookingResponse> getMyBookings(String userId) {
+        List<Booking> bookings = bookingRepository.findByUserId(userId);
+        return bookings.stream().map(MyBookingResponse::new).collect(Collectors.toList());
     }
 }

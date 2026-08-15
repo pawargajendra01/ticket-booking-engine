@@ -1,46 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TicketHub — My Bookings</title>
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-    <header class="topnav">
-        <a href="index.html" class="brand">TicketHub</a>
-        <nav>
-            <a href="index.html">Events</a>
-            <a href="my-bookings.html">My Bookings</a>
-            <a href="admin.html">Admin</a>
-        </nav>
-    </header>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>TicketHub — My Bookings</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+            rel="stylesheet">
+        <link rel="stylesheet" href="css/styles.css">
+    </head>
+    <body>
+        <header class="topnav">
+            <a href="index.html" class="brand">TicketHub</a>
+            <nav>
+                <a href="index.html">Events</a>
+                <a href="my-bookings.html">My Bookings</a>
+                <a href="admin.html">Admin</a>
+            </nav>
+        </header>
 
-    <main class="container">
-        <h1>Check Waitlist Status</h1>
-        <p id="status-message" class="status-message"></p>
+        <main class="container">
+            <h1>My Bookings</h1>
+            <form id="my-bookings-form">
+                <label for="myUserId">Your Name / User ID</label>
+                <input type="text" id="myUserId" required
+                    placeholder="e.g. alice">
+                <button type="submit" class="btn btn-primary">View My
+                    Bookings</button>
+            </form>
 
-        <form id="waitlist-form">
-            <label for="eventId">Event ID</label>
-            <input type="number" id="eventId" required placeholder="e.g. 1">
-            <button type="submit" class="btn btn-primary">Check Waitlist</button>
-        </form>
+            <div id="my-bookings-list" style="margin-top: 24px;"></div>
 
-        <div id="waitlist-results" style="margin-top: 24px;"></div>
+            <hr
+                style="margin: 32px 0; border: none; border-top: 1px solid var(--border);">
+            <h1>Check Waitlist Status</h1>
+            <p id="status-message" class="status-message"></p>
 
-        <hr style="margin: 32px 0; border: none; border-top: 1px solid #ddd;">
+            <form id="waitlist-form">
+                <label for="eventId">Event ID</label>
+                <input type="number" id="eventId" required placeholder="e.g. 1">
+                <button type="submit" class="btn btn-primary">Check
+                    Waitlist</button>
+            </form>
 
-        <h1>Cancel a Booking</h1>
-        <form id="cancel-form">
-            <label for="bookingId">Booking ID</label>
-            <input type="number" id="bookingId" required placeholder="e.g. 5">
-            <button type="submit" class="btn btn-secondary">Cancel Booking</button>
-        </form>
+            <div id="waitlist-results" style="margin-top: 24px;"></div>
 
-        <div id="cancel-result" style="margin-top: 20px;"></div>
-    </main>
+            <hr
+                style="margin: 32px 0; border: none; border-top: 1px solid #ddd;">
 
-    <script src="js/api.js"></script>
-    <script src="js/my-bookings.js"></script>
-</body>
+            <h1>Cancel a Booking</h1>
+            <form id="cancel-form">
+                <label for="bookingId">Booking ID</label>
+                <input type="number" id="bookingId" required
+                    placeholder="e.g. 5">
+                <button type="submit" class="btn btn-secondary">Cancel
+                    Booking</button>
+            </form>
+
+            <div id="cancel-result" style="margin-top: 20px;"></div>
+        </main>
+
+        <script src="js/api.js"></script>
+        <script src="js/my-bookings.js"></script>
+    </body>
 </html>

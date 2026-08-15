@@ -31,8 +31,15 @@ function startCountdown(deadlineIso) {
         const remainingMs = deadline - now;
 
         if (remainingMs <= 0) {
-            timerEl.textContent = "Time expired \u2014 seat may be released";
-            timerEl.style.color = "#b91c1c";
+            if (timerEl) {
+                timerEl.textContent = "Time expired \u2014 seat may be released";
+                timerEl.style.color = "#FF5C7A";
+            }
+            const retryBtn = document.getElementById("retry-payment-btn");
+            if (retryBtn) {
+                retryBtn.disabled = true;
+                retryBtn.textContent = "Payment Window Expired";
+            }
             stopCountdown();
             return;
         }
@@ -42,8 +49,10 @@ function startCountdown(deadlineIso) {
         const seconds = totalSeconds % 60;
         const formatted = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
-        timerEl.textContent = `Complete payment within: ${formatted}`;
-        timerEl.style.color = remainingMs < 60000 ? "#b91c1c" : "#92400e";
+        if (timerEl) {
+            timerEl.textContent = `Complete payment within: ${formatted}`;
+            timerEl.style.color = remainingMs < 60000 ? "#FF5C7A" : "#F2B705";
+        }
     }
 
     tick();
@@ -81,19 +90,23 @@ function renderPaidResult(bookingId) {
     `;
 }
 
-function renderPaymentPendingResult(bookingId, statusMessage, deadlineIso) {
+function renderPaymentPendingResult(bookingResponse, statusMessage) {
     const resultDiv = document.getElementById("result");
     resultDiv.innerHTML = `
         <div class="result-box">
             <span class="badge badge-waitlisted">PAYMENT PENDING</span>
-            <p style="margin-top: 12px;">Booking ID: ${bookingId}</p>
+            <p style="margin-top: 12px;">Booking ID: ${bookingResponse.bookingId}</p>
             <p>${statusMessage}</p>
             <p id="countdown-timer" style="font-weight: 700; margin-top: 12px;"></p>
+            <button id="retry-payment-btn" class="btn btn-primary" style="margin-top: 14px;">Retry Payment</button>
         </div>
     `;
-    if (deadlineIso) {
-        startCountdown(deadlineIso);
+
+    if (bookingResponse.paymentDeadline) {
+        startCountdown(bookingResponse.paymentDeadline);
     }
+
+    document.getElementById("retry-payment-btn").addEventListener("click", () => startPayment(bookingResponse));
 }
 
 async function startPayment(bookingResponse) {
@@ -113,7 +126,7 @@ async function startPayment(bookingResponse) {
                 name: bookingResponse.userId,
             },
             theme: {
-                color: "#4f46e5",
+                color: "#F2B705",
             },
             handler: async function (razorpayResponse) {
                 try {
@@ -125,12 +138,12 @@ async function startPayment(bookingResponse) {
                     );
                     renderPaidResult(bookingId);
                 } catch (verifyError) {
-                    renderPaymentPendingResult(bookingId, `Payment verification failed: ${verifyError.message}`, bookingResponse.paymentDeadline);
+                    renderPaymentPendingResult(bookingResponse, `Payment verification failed: ${verifyError.message}`);
                 }
             },
             modal: {
                 ondismiss: function () {
-                    renderPaymentPendingResult(bookingId, "Payment window closed before completing.", bookingResponse.paymentDeadline);
+                    renderPaymentPendingResult(bookingResponse, "Payment window closed before completing.");
                 },
             },
         };
@@ -138,7 +151,7 @@ async function startPayment(bookingResponse) {
         const razorpayCheckout = new Razorpay(options);
         razorpayCheckout.open();
     } catch (error) {
-        renderPaymentPendingResult(bookingId, `Could not start payment: ${error.message}`, bookingResponse.paymentDeadline);
+        renderPaymentPendingResult(bookingResponse, `Could not start payment: ${error.message}`);
     }
 }
 

@@ -4,15 +4,18 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gajendra.ticketbooking.entity.Booking;
 import com.gajendra.ticketbooking.entity.BookingStatus;
 import com.gajendra.ticketbooking.entity.Event;
 import com.gajendra.ticketbooking.exception.EventNotFoundException;
@@ -68,15 +71,23 @@ public class EventController {
                 .orElseThrow(() -> new EventNotFoundException(id));
     }
 
+    @Transactional
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteEvent(@PathVariable Long id, @RequestParam(defaultValue = "false") boolean force) {
         if (!eventRepository.existsById(id)) {
             throw new EventNotFoundException(id);
         }
         long activeBookings = bookingRepository.countByEventIdAndStatusIn(id, List.of(BookingStatus.CONFIRMED, BookingStatus.WAITLISTED));
-        if (activeBookings > 0) {
+
+        if (activeBookings > 0 && !force) {
             throw new InvalidBookingStateException("Cannot delete event with active bookings");
         }
+
+        if (activeBookings > 0) {
+            List<Booking> bookings = bookingRepository.findByEventId(id);
+            bookingRepository.deleteAll(bookings);
+        }
+
         eventRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }

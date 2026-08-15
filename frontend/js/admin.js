@@ -43,7 +43,24 @@ async function handleDeleteClick(eventId, buttonEl) {
         await deleteEvent(eventId);
         loadExistingEvents();
     } catch (error) {
-        alert(`Could not delete event: ${error.message}`);
+        if (error.message.includes("active bookings")) {
+            const forceConfirmed = confirm(
+                `WARNING: Event #${eventId} has customers with confirmed or waitlisted bookings.\n\nForce-deleting will PERMANENTLY CANCEL all of their bookings. This cannot be undone.\n\nAre you absolutely sure?`
+            );
+
+            if (forceConfirmed) {
+                try {
+                    await deleteEvent(eventId, true);
+                    loadExistingEvents();
+                    return;
+                } catch (forceError) {
+                    alert(`Could not delete event: ${forceError.message}`);
+                }
+            }
+        } else {
+            alert(`Could not delete event: ${error.message}`);
+        }
+
         buttonEl.disabled = false;
         buttonEl.textContent = "Delete";
     }
@@ -73,14 +90,23 @@ async function loadExistingEvents() {
             deleteBtn.addEventListener("click", () => handleDeleteClick(event.id, deleteBtn));
 
             const info = document.createElement("div");
+            info.className = "card-top";
             info.innerHTML = `
-                <h2>${event.name} (ID: ${event.id})</h2>
-                <p>${event.venue || "No venue set"} \u2022 ${event.eventDateTime || "No date set"}</p>
-                <p>${event.availableSeats} / ${event.totalSeats} seats available</p>
-            `;
+    <h2>${event.name} (ID: ${event.id})</h2>
+    <p>${event.venue || "No venue set"} \u2022 ${event.eventDateTime || "No date set"}</p>
+    <p>${event.availableSeats} / ${event.totalSeats} seats available</p>
+`;
+
+            const divider = document.createElement("div");
+            divider.className = "ticket-divider";
+
+            const bottom = document.createElement("div");
+            bottom.className = "card-bottom";
+            bottom.appendChild(deleteBtn);
 
             row.appendChild(info);
-            row.appendChild(deleteBtn);
+            row.appendChild(divider);
+            row.appendChild(bottom);
             listDiv.appendChild(row);
         });
     } catch (error) {
